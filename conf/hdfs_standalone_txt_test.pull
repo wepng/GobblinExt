@@ -1,0 +1,52 @@
+job.name=Dev2KafkaHDFSAVRO_test
+job.group=GobblinData4SAHDFS_test
+job.description=Periodly pull data from Kafka from prod to HDFS, with avro format
+job.lock.enable=false
+job.schedule=0 10 0 * * ?
+
+kafka.brokers=x15:9091
+
+source.class=gobblin.source.extractor.extract.kafka.KafkaSimpleSource
+extract.namespace=gobblin.extract.kafka
+
+topic.whitelist=biz_stats
+writer.builder.class=gobblin.writer.SimpleDataWriterBuilder
+simple.writer.delimiter=\n
+simple.writer.prepend.size=false
+writer.file.path.type=tablename
+writer.destination.type=HDFS
+writer.output.format=csv
+writer.partitioner.class=xiaomei.gobblin.core.writer.partitioner.TimeBasedJsonWriterPartitioner
+writer.partition.level=date
+writer.partition.pattern=YYYY/MM/dd
+writer.partition.columns=timestamp
+writer.partition.timezone=Asia/Shanghai
+
+data.publisher.type=gobblin.publisher.TimePartitionedDataPublisher
+
+mr.job.max.mappers=1
+
+writer.staging.dir=${env:GOBBLIN_WORK_DIR}/test/task-staging
+writer.output.dir=${env:GOBBLIN_WORK_DIR}/test/task-output
+
+# Data publisher related configuration properties
+data.publisher.final.dir=${env:GOBBLIN_WORK_DIR}/test/job-output
+
+# Directory where job configuration files are stored
+jobconf.dir=${env:GOBBLIN_JOB_CONFIG_DIR}
+
+# Directory where job/task state files are stored
+state.store.dir=${env:GOBBLIN_WORK_DIR}/test/state-store
+
+# Directory where error files from the quality checkers are stored
+qualitychecker.row.err.file=${env:GOBBLIN_WORK_DIR}/test/err
+
+# Directory where job locks are stored
+job.lock.dir=${env:GOBBLIN_WORK_DIR}/test/locks
+
+# Directory where metrics log files are stored
+metrics.log.dir=${env:GOBBLIN_WORK_DIR}/test/metrics
+
+metrics.reporting.file.enabled=true
+metrics.reporting.file.suffix=txt
+bootstrap.with.offset=earliest
